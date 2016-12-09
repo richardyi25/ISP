@@ -24,6 +24,6 @@ public class SplashScreen extends Thread
 
     public void run ()
     {
-	delay (1000);
+	//delay (1000);
     }
 }
