@@ -1,3 +1,12 @@
+/*
+Dec. 12 2016
+Richard Yi
+Mrs. Krasteva
+ISP (Minesweeper)
+
+This program is a minesweeper game.
+*/
+
 import hsa.*;
 import java.awt.*;
 import java.io.*;
@@ -11,7 +20,7 @@ public class Minesweeper
     int grid[] [] = new int [25] [25];
     int size;
     char menuChoice;
-    Font titleFont = new Font ("Comic Sans MS", 0, 40);
+
 
 
     public Minesweeper ()
@@ -19,6 +28,12 @@ public class Minesweeper
 	//A character is 8 pixels wide and 20 pixels tall
 	//Window is approx. 500 by 800 pixels
 	c = new Console (27, 101, "Minesweeper");
+    }
+
+
+    private void title (String text)
+    {
+	c.clear ();
     }
 
 
@@ -33,16 +48,14 @@ public class Minesweeper
     public void splashScreen () throws InterruptedException
     {
 	SplashScreen s = new SplashScreen (c);
-
 	s.start ();
     }
 
 
     public void mainMenu ()
     {
-	c.clear ();
+	title ("Minesweeper");
 
-	c.setFont (titleFont);
 	c.drawString ("Minesweeper", 285, 50);
 
 	c.setFont (new Font ("Comic Sans MS", 0, 20));
@@ -80,7 +93,7 @@ public class Minesweeper
     {
 	c.clear ();
 
-	c.setFont (titleFont);
+	//c.setFont (titleFont);
 	c.drawString ("Instructions", 285, 50);
 
 	c.getChar ();
@@ -110,9 +123,10 @@ public class Minesweeper
     }
 
 
-    public static void main (String[] args) throws IOException
+    public static void main (String[] args) throws IOException, InterruptedException
     {
 	Minesweeper m = new Minesweeper ();
+	m.splashScreen ();
 
 	while (true)
 	{
