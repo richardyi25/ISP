@@ -19,6 +19,7 @@ public class Minesweeper
     int adj[] [] = new int [25] [25];
     int grid[] [] = new int [25] [25];
     int size;
+    int currentX, currentY;
     char menuChoice;
 
 
@@ -31,16 +32,18 @@ public class Minesweeper
     }
 
 
-    private void title (String text)
+    private void title (String text, int x, int y)
     {
 	c.clear ();
+	c.setFont (new Font ("Comic Sans MS", 0, 40));
+	c.drawString (text, x, y);
     }
 
 
     private void pauseProgram (int y)
     {
 	c.setFont (new Font ("Comic Sans MS", 0, 30));
-	c.drawString ("Press any key to continue...", 50, y);
+	c.drawString ("Press any key to continue...", 69, y);
 	c.getChar ();
     }
 
@@ -54,9 +57,7 @@ public class Minesweeper
 
     public void mainMenu ()
     {
-	title ("Minesweeper");
-
-	c.drawString ("Minesweeper", 285, 50);
+	title ("Minesweeper", 285, 50);
 
 	c.setFont (new Font ("Comic Sans MS", 0, 20));
 
@@ -91,23 +92,23 @@ public class Minesweeper
 
     public void instructions ()
     {
-	c.clear ();
+	title ("Instructions", 285, 50);
 
-	//c.setFont (titleFont);
-	c.drawString ("Instructions", 285, 50);
-
-	c.getChar ();
+	pauseProgram (500);
     }
 
 
     public void highScores ()
     {
-
+	title ("High Scores", 300, 50);
+	pauseProgram (500);
     }
 
 
     public void goodbye ()
     {
+	title ("Minesweeper", 285, 50);
+
 	c.setFont (new Font ("Comic Sans MS", 0, 30));
 	c.drawString ("Thank you for using my program", 69, 300);
 	c.drawString ("Made by: Richard Yi", 69, 400);
@@ -117,9 +118,28 @@ public class Minesweeper
     }
 
 
-    public void game ()
+    private void result (boolean win)
+    {
+	title ("Results", 350, 50);
+
+	if (win)
+	    c.print ("you won lol");
+	else
+	    c.print ("wow git gud xD");
+
+	pauseProgram (500);
+    }
+
+
+    private void render ()
     {
 
+    }
+
+
+    public void game ()
+    {
+	result (false);
     }
 
 
@@ -145,4 +165,3 @@ public class Minesweeper
 	m.goodbye ();
     }
 }
-
