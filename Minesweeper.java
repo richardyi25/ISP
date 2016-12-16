@@ -14,15 +14,15 @@ import java.io.*;
 public class Minesweeper
 {
     Console c;
+
     final int SIZE = 25;
     boolean mines[] [] = new boolean [25] [25];
     int adj[] [] = new int [25] [25];
     int grid[] [] = new int [25] [25];
-    int size;
+
+    int size, squareSize;
     int currentX, currentY;
     char menuChoice;
-
-
 
     public Minesweeper ()
     {
@@ -133,12 +133,62 @@ public class Minesweeper
 
     private void render ()
     {
+	c.clear ();
+	for (int y = 0 ; y < size ; y++)
+	{
+	    for (int x = 0 ; x < size ; x++)
+	    {
 
+	    }
+	}
+
+	c.fillRect (currentX * 50, currentY * 50, 50, 50);
     }
 
 
     public void game ()
     {
+	boolean exit = false;
+	char input;
+	render ();
+
+	switch (menuChoice)
+	{
+	    case 1:
+		break;
+		//finish this later
+	}
+
+	while (!exit)
+	{
+	    input = c.getChar ();
+	    switch (input)
+	    {
+		case 'W':
+		case 'w':
+		    --currentY;
+		    break;
+		case 'A':
+		case 'a':
+		    --currentX;
+		    break;
+		case 'S':
+		case 's':
+		    ++currentY;
+		    break;
+		case 'D':
+		case 'd':
+		    ++currentX;
+		    break;
+		case 'Q':
+		case 'q':
+		    exit = true;
+	    }
+
+
+	    render ();
+	}
+
 	result (false);
     }
 
