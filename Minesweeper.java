@@ -18,8 +18,9 @@ public class Minesweeper
     final int SIZE = 20;
     boolean isMine[] [] = new boolean [SIZE] [SIZE];
     int adj[] [] = new int [SIZE] [SIZE];
-    int grid[] [] = new int [SIZE] [SIZE];
-    boolean vist[] [] = new boolean [SIZE] [SIZE];
+    boolean uncovered[] [] = new boolean [SIZE] [SIZE];
+    boolean flagged[] [] = new boolean [SIZE] [SIZE];
+    boolean vist[] [] = new boolean [SIZE] [SIZE]; //For DFS
 
     int gridSize, squareSize, mines;
     int currentX, currentY;
@@ -202,7 +203,7 @@ public class Minesweeper
 
     private void uncover (int x, int y)
     {
-	grid [y] [x] = 1;
+	uncovered [y] [x] = true;
 	c.setColor (Color.lightGray);
 	c.fillRect (x * squareSize + 1, y * squareSize + 1, squareSize - 2, squareSize - 2);
 	c.setColor (Color.black);
@@ -233,6 +234,8 @@ public class Minesweeper
     {
 	if (isMine [currentY] [currentX])
 	    return true;
+	else if (uncovered [currentY] [currentX] || flagged [currentY] [currentX])
+	    return false;
 	else if (adj [currentY] [currentX] > 0)
 	    uncover (currentX, currentY);
 	else
@@ -248,12 +251,6 @@ public class Minesweeper
     }
 
 
-    private void flag ()
-    {
-
-    }
-
-
     private void generate ()
     {
 	for (int y = 0 ; y < gridSize ; y++)
@@ -262,7 +259,8 @@ public class Minesweeper
 	    {
 		isMine [y] [x] = false;
 		adj [y] [x] = 0;
-		grid [y] [x] = 0;
+		uncovered [y] [x] = false;
+		flagged [y] [x] = false;
 	    }
 	}
 	//Reset all grid information
@@ -305,10 +303,34 @@ public class Minesweeper
     }
 
 
+    private void flag ()
+    {
+	if (uncovered [currentY] [currentX])
+	    return;
+	if (flagged [currentY] [currentX])
+	{
+	    flagged [currentY] [currentX] = false;
+	    c.setColor (Color.gray);
+	    c.fillRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
+	}
+	else
+	{
+	    flagged [currentY] [currentX] = true;
+	    c.setColor (Color.yellow);
+	    c.fillRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
+	}
+    }
+
+
     private void showControls ()
     {
 	Console d = new Console ("Controls");
 	d.print ("These are the controls:");
+	d.println ("Use the WASD keys to move the current square you are selecting");
+	d.println ("Press W to move up, A to move left, S to move down, and D to move right");
+	d.println ("Press O to uncover the selected square");
+	d.println ("Press P to flag the current square");
+
 	d.getChar ();
 	d.close ();
     }
