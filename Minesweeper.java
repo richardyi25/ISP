@@ -15,10 +15,11 @@ public class Minesweeper
 {
     Console c;
 
-    final int SIZE = 25;
-    boolean isMine[] [] = new boolean [25] [25];
-    int adj[] [] = new int [25] [25];
-    int grid[] [] = new int [25] [25];
+    final int SIZE = 20;
+    boolean isMine[] [] = new boolean [SIZE] [SIZE];
+    int adj[] [] = new int [SIZE] [SIZE];
+    int grid[] [] = new int [SIZE] [SIZE];
+    boolean vist[] [] = new boolean [SIZE] [SIZE];
 
     int gridSize, squareSize, mines;
     int currentX, currentY;
@@ -28,7 +29,7 @@ public class Minesweeper
     {
 	//A character is 8 pixels wide and 20 pixels tall
 	//Window is approx. 600 by 900 pixels
-	c = new Console (32, 113, "Minesweeper");
+	c = new Console (31, 113, "Minesweeper");
     }
 
 
@@ -143,13 +144,13 @@ public class Minesweeper
 		mines = 20;
 		break;
 	    case '2':
-		gridSize = 20;
-		squareSize = 30;
+		gridSize = 15;
+		squareSize = 40;
 		mines = 40;
 		break;
 	    case '3':
-		gridSize = 30;
-		squareSize = 20;
+		gridSize = 20;
+		squareSize = 30;
 		mines = 60;
 		break;
 	}
@@ -199,13 +200,57 @@ public class Minesweeper
     }
 
 
-    private boolean click (boolean leftClick)
+    private void uncover (int x, int y)
+    {
+	grid [y] [x] = 1;
+	c.setColor (Color.lightGray);
+	c.fillRect (x * squareSize + 1, y * squareSize + 1, squareSize - 2, squareSize - 2);
+	c.setColor (Color.black);
+	if (adj [y] [x] > 0)
+	    c.drawString (String.valueOf (adj [y] [x]), x * squareSize + squareSize / 3, y * squareSize + squareSize / 3);
+    }
+
+
+    private void DFS (int x, int y)
+    {
+	vist [y] [x] = true;
+	uncover (x, y);
+
+	for (int i = -1 ; i <= 1 ; i++)
+	    for (int j = -1 ; j <= 1 ; j++) //Check all cells adjacent (delta x and delta y ranging from -1 to 1)
+		if (y + i >= 0 && y + i < gridSize && x + j >= 0 && x + j < gridSize && !isMine [y + i] [x + j] && !vist [y + i] [x + j])
+		{
+		    //If cell is within the grid and is not a mine, and hasn't been visited before
+		    if (adj [y + i] [x + j] > 0)
+			uncover (x + j, y + i); //If cell has some adjacent mines, uncover
+		    else
+			DFS (x + j, y + i); //If cell has no adjacent mines, recurse
+		}
+    }
+
+
+    private boolean click ()
     {
 	if (isMine [currentY] [currentX])
-	{
 	    return true;
+	else if (adj [currentY] [currentX] > 0)
+	    uncover (currentX, currentY);
+	else
+	{
+	    for (int y = 0 ; y < gridSize ; y++)
+		for (int x = 0 ; x < gridSize ; x++)
+		    vist [y] [x] = false;
+
+	    DFS (currentX, currentY);
 	}
+
 	return false;
+    }
+
+
+    private void flag ()
+    {
+
     }
 
 
@@ -215,10 +260,12 @@ public class Minesweeper
 	{
 	    for (int x = 0 ; x < gridSize ; x++)
 	    {
-		isMine [x] [y] = false;
-		grid [x] [y] = 0;
+		isMine [y] [x] = false;
+		adj [y] [x] = 0;
+		grid [y] [x] = 0;
 	    }
 	}
+	//Reset all grid information
 
 	int i = 0;
 	int randomX, randomY;
@@ -232,10 +279,27 @@ public class Minesweeper
 	    {
 		isMine [randomY] [randomX] = true;
 
-		c.setColor (Color.red);
-		c.fillRect (randomX * squareSize + 1, randomY * squareSize + 1, squareSize, squareSize);
-
+		//----------------
+		//DEBUG
+		//c.setColor (Color.red);
+		//c.fillRect (randomX * squareSize + 1, randomY * squareSize + 1, squareSize - 2, squareSize - 2);
+		//----------------
 		++i;
+	    }
+	}
+
+	int count;
+	for (int y = 0 ; y < gridSize ; y++)
+	{
+	    for (int x = 0 ; x < gridSize ; x++)
+	    {
+		count = 0;
+		for (i = -1 ; i <= 1 ; i++)
+		    for (int j = -1 ; j <= 1 ; j++)
+			if (y + i >= 0 && y + i < gridSize && x + j >= 0 && x + j < gridSize && isMine [y + i] [x + j])
+			    ++count;
+
+		adj [y] [x] = count;
 	    }
 	}
     }
@@ -293,12 +357,13 @@ public class Minesweeper
 		    if (firstClick)
 			generate ();
 		    firstClick = false;
-		    if (click (true))
+
+		    if (click ())
 			exit = true;
 		    break;
 		case 'P':
 		case 'p':
-		    click (false);
+		    flag ();
 		    break;
 	    }
 	}
