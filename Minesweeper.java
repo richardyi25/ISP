@@ -140,14 +140,17 @@ public class Minesweeper
 	    case '1':
 		gridSize = 10;
 		squareSize = 60;
+		mines = 20;
 		break;
 	    case '2':
 		gridSize = 20;
 		squareSize = 30;
+		mines = 40;
 		break;
 	    case '3':
 		gridSize = 30;
 		squareSize = 20;
+		mines = 60;
 		break;
 	}
 
@@ -156,7 +159,14 @@ public class Minesweeper
 
 	for (int i = 0 ; i < gridSize ; i++)
 	    for (int j = 0 ; j < gridSize ; j++)
+	    {
+		c.setColor (Color.gray);
+		c.fillRect (i * squareSize, j * squareSize, squareSize, squareSize);
+		c.setColor (Color.black);
 		c.drawRect (i * squareSize, j * squareSize, squareSize, squareSize);
+		c.setColor (Color.white);
+		c.drawRect (i * squareSize + 1, j * squareSize + 1, squareSize - 2, squareSize - 2);
+	    }
     }
 
 
@@ -170,12 +180,32 @@ public class Minesweeper
 	currentX += dx;
 	currentY += dy;
 
+	if (currentX < 0)
+	    currentX = 0;
+	else if (currentX >= gridSize)
+	    currentX = gridSize - 1;
+	if (currentY < 0)
+	    currentY = 0;
+	else if (currentY >= gridSize)
+	    currentY = gridSize - 1;
+
+
 	c.setColor (Color.red);
 	c.drawRect (currentX * squareSize, currentY * squareSize, squareSize, squareSize);
 	c.drawRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
 
 
 	c.setColor (Color.black);
+    }
+
+
+    private boolean click (boolean leftClick)
+    {
+	if (isMine [currentY] [currentX])
+	{
+	    return true;
+	}
+	return false;
     }
 
 
@@ -195,12 +225,16 @@ public class Minesweeper
 
 	while (i < mines)
 	{
-	    randomX = (int) (Math.random () * gridSize + 1);
-	    randomY = (int) (Math.random () * gridSize + 1);
+	    randomX = (int) (Math.random () * gridSize);
+	    randomY = (int) (Math.random () * gridSize);
 
 	    if ((Math.abs (randomX - currentX) > 1 || Math.abs (randomY - currentY) > 1) && !isMine [randomY] [randomX])
 	    {
 		isMine [randomY] [randomX] = true;
+
+		c.setColor (Color.red);
+		c.fillRect (randomX * squareSize + 1, randomY * squareSize + 1, squareSize, squareSize);
+
 		++i;
 	    }
 	}
@@ -258,11 +292,13 @@ public class Minesweeper
 		case 'o':
 		    if (firstClick)
 			generate ();
-		    //handle "click" keypress
+		    firstClick = false;
+		    if (click (true))
+			exit = true;
 		    break;
 		case 'P':
 		case 'p':
-		    //handle "right click" keypress
+		    click (false);
 		    break;
 	    }
 	}
