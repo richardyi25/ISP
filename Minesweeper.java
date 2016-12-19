@@ -15,7 +15,7 @@ public class Minesweeper
 {
     Console c;
 
-    final int SIZE = 20;
+    final int SIZE = 30;
     boolean isMine[] [] = new boolean [SIZE] [SIZE];
     int adj[] [] = new int [SIZE] [SIZE];
     boolean uncovered[] [] = new boolean [SIZE] [SIZE];
@@ -326,15 +326,17 @@ public class Minesweeper
 
     private void showControls ()
     {
-	Console d = new Console ("Controls");
-	d.print ("These are the controls:");
-	d.println ("Use the WASD keys to move the current square you are selecting");
-	d.println ("Press W to move up, A to move left, S to move down, and D to move right");
-	d.println ("Press O to uncover the selected square");
-	d.println ("Press P to flag the current square");
+	/*
+	    Console d = new Console ("Controls");
+	    d.print ("These are the controls:");
+	    d.println ("Use the WASD keys to move the current square you are selecting");
+	    d.println ("Press W to move up, A to move left, S to move down, and D to move right");
+	    d.println ("Press O to uncover the selected square");
+	    d.println ("Press P to flag the current square");
 
-	d.getChar ();
-	d.close ();
+	    d.getChar ();
+	    d.close ();
+	*/
     }
 
 
@@ -418,8 +420,6 @@ public class Minesweeper
 	Minesweeper m = new Minesweeper ();
 	m.splashScreen ();
 
-	CustomTimer timer = new CustomTimer ();
-	timer.start ();
 
 	while (true)
 	{
