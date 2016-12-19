@@ -232,9 +232,11 @@ public class Minesweeper
 
     private boolean click ()
     {
+	if (flagged [currentY] [currentX])
+	    return false;
 	if (isMine [currentY] [currentX])
 	    return true;
-	else if (uncovered [currentY] [currentX] || flagged [currentY] [currentX])
+	else if (uncovered [currentY] [currentX])
 	    return false;
 	else if (adj [currentY] [currentX] > 0)
 	    uncover (currentX, currentY);
@@ -317,7 +319,7 @@ public class Minesweeper
 	{
 	    flagged [currentY] [currentX] = true;
 	    c.setColor (Color.yellow);
-	    c.fillRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
+	    c.fillRect (currentX * squareSize + 2, currentY * squareSize + 2, squareSize - 3, squareSize - 3);
 	}
     }
 
@@ -338,6 +340,9 @@ public class Minesweeper
 
     public void game ()
     {
+	MyTimer mt = new MyTimer (c);
+	mt.start ();
+
 	boolean exit = false;
 	boolean firstClick = true;
 
@@ -390,6 +395,7 @@ public class Minesweeper
 	    }
 	}
 
+	mt.stop ();
 	result (false);
     }
 
@@ -411,6 +417,9 @@ public class Minesweeper
     {
 	Minesweeper m = new Minesweeper ();
 	m.splashScreen ();
+
+	CustomTimer timer = new CustomTimer ();
+	timer.start ();
 
 	while (true)
 	{
