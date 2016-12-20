@@ -21,6 +21,7 @@ public class Minesweeper
     boolean uncovered[] [] = new boolean [SIZE] [SIZE];
     boolean flagged[] [] = new boolean [SIZE] [SIZE];
     boolean vist[] [] = new boolean [SIZE] [SIZE]; //For DFS
+    boolean cheating;
 
     int gridSize, squareSize, mines;
     int currentX, currentY;
@@ -164,6 +165,17 @@ public class Minesweeper
 	    }
 	}
 
+	for (int y = 0 ; y < gridSize ; y++)
+	{
+	    for (int x = 0 ; x < gridSize ; x++)
+	    {
+		isMine [y] [x] = false;
+		adj [y] [x] = 0;
+		uncovered [y] [x] = false;
+		flagged [y] [x] = false;
+	    }
+	}
+
 	redrawCursor ();
     }
 
@@ -213,14 +225,6 @@ public class Minesweeper
 	c.setColor (Color.black);
 	c.setFont (new Font ("Comic Sans MS", 0, 20));
 
-	/*
-		c.clear ();
-		c.drawString ("9", 20, 20);
-		c.drawLine (20, 0, 20, 600);
-		c.drawLine (0, 20, 800, 20);
-
-		c.getChar ();
-	*/
 	if (adj [y] [x] > 0)
 	    c.drawString (String.valueOf (adj [y] [x]), x * squareSize + (squareSize - 20) / 2 + 5, y * squareSize + (squareSize - 20) / 2 + 20);
     }
@@ -279,18 +283,6 @@ public class Minesweeper
 
     private void generate ()
     {
-	for (int y = 0 ; y < gridSize ; y++)
-	{
-	    for (int x = 0 ; x < gridSize ; x++)
-	    {
-		isMine [y] [x] = false;
-		adj [y] [x] = 0;
-		uncovered [y] [x] = false;
-		flagged [y] [x] = false;
-	    }
-	}
-	//Reset all grid information
-
 	int i = 0;
 	int randomX, randomY;
 
@@ -336,7 +328,10 @@ public class Minesweeper
 	if (flagged [currentY] [currentX])
 	{
 	    flagged [currentY] [currentX] = false;
-	    c.setColor (Color.gray);
+	    if (cheating && isMine [currentY] [currentX])
+		c.setColor (Color.orange);
+	    else
+		c.setColor (Color.gray);
 	    c.fillRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
 	}
 	else
@@ -355,6 +350,8 @@ public class Minesweeper
 	    for (int x = 0 ; x < gridSize ; x++)
 		if (isMine [y] [x])
 		    c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
+
+	cheating = true;
     }
 
 

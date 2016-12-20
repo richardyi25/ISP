@@ -12,26 +12,20 @@ public class MyTimer extends Thread
     }
 
 
-    private void delay (int ms)
-    {
-	try
-	{
-	    sleep (ms);
-	}
-	catch (InterruptedException e)
-	{
-
-	}
-    }
-
-
     public void run ()
     {
 	Font f = new Font ("Arial", 0, 30);
 	seconds = 0;
 	while (true)
 	{
-	    delay (1000);
+	    try
+	    {
+		sleep (1000);
+	    }
+	    catch (InterruptedException e)
+	    {
+
+	    }
 	    ++seconds;
 	    c.setColor (Color.white);
 	    c.fillRect (650, 150, 150, 150);
