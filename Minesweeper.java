@@ -348,19 +348,13 @@ public class Minesweeper
     }
 
 
-    private void showControls ()
+    private void cheat ()
     {
-	/*
-	    Console d = new Console ("Controls");
-	    d.print ("These are the controls:");
-	    d.println ("Use the WASD keys to move the current square you are selecting");
-	    d.println ("Press W to move up, A to move left, S to move down, and D to move right");
-	    d.println ("Press O to uncover the selected square");
-	    d.println ("Press P to flag the current square");
-
-	    d.getChar ();
-	    d.close ();
-	*/
+	c.setColor (Color.orange);
+	for (int y = 0 ; y < gridSize ; y++)
+	    for (int x = 0 ; x < gridSize ; x++)
+		if (isMine [y] [x])
+		    c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
     }
 
 
@@ -382,10 +376,6 @@ public class Minesweeper
 	    input = c.getChar ();
 	    switch (input)
 	    {
-		case '?':
-		case 'H':
-		case 'h':
-		    showControls ();
 		case 'W':
 		case 'w':
 		    moveSelected (0, -1);
@@ -429,25 +419,47 @@ public class Minesweeper
 		case 'p':
 		    flag ();
 		    break;
+		case 'C':
+		case 'c':
+		    cheat ();
+		    break;
 	    }
 	}
 
 	mt.stop ();
 
 	if (win)
-	    result (mt.seconds);
+	{
+	    c.setColor (Color.green);
+	    for (int y = 0 ; y < gridSize ; y++)
+		for (int x = 0 ; x < gridSize ; x++)
+		    if (isMine [y] [x])
+			c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
+	}
 	else
 	{
-	    c.setColor (Color.red);
-
 	    for (int y = 0 ; y < gridSize ; y++)
 	    {
 		for (int x = 0 ; x < gridSize ; x++)
 		{
-		    if (isMine [y] [x] && !uncovered [y] [x])
-			c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
+		    if (isMine [y] [x])
+		    {
+			if (flagged [y] [x])
+			{
+			    c.setColor (Color.green);
+			    c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
+			}
+			else
+			{
+			    c.setColor (Color.red);
+			    c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
+			}
+		    }
 		    else if (flagged [y] [x] && !isMine [y] [x])
+		    {
+			c.setColor (Color.red);
 			c.fillRect (x * squareSize + squareSize / 4, y * squareSize + squareSize / 4, squareSize / 2, squareSize / 2);
+		    }
 		}
 	    }
 	}
@@ -459,7 +471,8 @@ public class Minesweeper
 		break;
 	}
 
-	result (-1);
+	result ((win ? mt.seconds:
+	- 1));
     }
 
 
@@ -469,7 +482,7 @@ public class Minesweeper
 	title ("Results", 350, 50);
 
 	if (score >= 0)
-	    c.print ("you won lol");
+	    c.print ("you won lol. your score was " + score);
 	else
 	    c.print ("wow git gud xD");
 
