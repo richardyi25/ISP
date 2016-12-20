@@ -38,6 +38,7 @@ public class Minesweeper
     {
 	c.clear ();
 	c.setFont (new Font ("Comic Sans MS", 0, 40));
+	c.setColor (Color.black);
 	c.drawString (text, x, y);
     }
 
@@ -45,6 +46,7 @@ public class Minesweeper
     private void pauseProgram (int y)
     {
 	c.setFont (new Font ("Comic Sans MS", 0, 30));
+	c.setColor (Color.black);
 	c.drawString ("Press any key to continue...", 69, y);
 	c.getChar ();
     }
@@ -62,6 +64,7 @@ public class Minesweeper
 	title ("Minesweeper", 285, 50);
 
 	c.setFont (new Font ("Comic Sans MS", 0, 20));
+	c.setColor (Color.black);
 
 	c.drawString ("Press 1 to play easy mode", 10, 100);
 	c.drawString ("Press 2 to play medium mode", 10, 150);
@@ -112,6 +115,8 @@ public class Minesweeper
 	title ("Minesweeper", 285, 50);
 
 	c.setFont (new Font ("Comic Sans MS", 0, 30));
+	c.setColor (Color.black);
+
 	c.drawString ("Thank you for using my program", 69, 300);
 	c.drawString ("Made by: Richard Yi", 69, 400);
 
@@ -119,19 +124,6 @@ public class Minesweeper
 	c.close ();
     }
 
-
-    /*
-    private void delay (int ms)
-    {
-	try
-	{
-	    Thread.sleep (ms);
-	}
-	catch (InterruptedException e)
-	{
-	}
-    }
-    */
 
     private void init ()
     {
@@ -152,7 +144,7 @@ public class Minesweeper
 	    case '3':
 		gridSize = 20;
 		squareSize = 30;
-		mines = 60;
+		mines = 70;
 		break;
 	}
 
@@ -160,6 +152,7 @@ public class Minesweeper
 	currentY = 0;
 
 	for (int i = 0 ; i < gridSize ; i++)
+	{
 	    for (int j = 0 ; j < gridSize ; j++)
 	    {
 		c.setColor (Color.gray);
@@ -169,6 +162,17 @@ public class Minesweeper
 		c.setColor (Color.white);
 		c.drawRect (i * squareSize + 1, j * squareSize + 1, squareSize - 2, squareSize - 2);
 	    }
+	}
+
+	redrawCursor ();
+    }
+
+
+    private void redrawCursor ()
+    {
+	c.setColor (Color.red);
+	c.drawRect (currentX * squareSize, currentY * squareSize, squareSize, squareSize);
+	c.drawRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
     }
 
 
@@ -191,11 +195,7 @@ public class Minesweeper
 	else if (currentY >= gridSize)
 	    currentY = gridSize - 1;
 
-
-	c.setColor (Color.red);
-	c.drawRect (currentX * squareSize, currentY * squareSize, squareSize, squareSize);
-	c.drawRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
-
+	redrawCursor ();
 
 	c.setColor (Color.black);
     }
@@ -206,9 +206,23 @@ public class Minesweeper
 	uncovered [y] [x] = true;
 	c.setColor (Color.lightGray);
 	c.fillRect (x * squareSize + 1, y * squareSize + 1, squareSize - 2, squareSize - 2);
+	c.setColor (Color.white);
+	c.drawRect (x * squareSize + 1, y * squareSize + 1, squareSize - 2, squareSize - 2);
+	redrawCursor ();
+
 	c.setColor (Color.black);
+	c.setFont (new Font ("Comic Sans MS", 0, 20));
+
+	/*
+		c.clear ();
+		c.drawString ("9", 20, 20);
+		c.drawLine (20, 0, 20, 600);
+		c.drawLine (0, 20, 800, 20);
+
+		c.getChar ();
+	*/
 	if (adj [y] [x] > 0)
-	    c.drawString (String.valueOf (adj [y] [x]), x * squareSize + squareSize / 3, y * squareSize + squareSize / 3);
+	    c.drawString (String.valueOf (adj [y] [x]), x * squareSize + (squareSize - 20) / 2 + 5, y * squareSize + (squareSize - 20) / 2 + 20);
     }
 
 
@@ -248,8 +262,18 @@ public class Minesweeper
 
 	    DFS (currentX, currentY);
 	}
-
 	return false;
+    }
+
+
+    public boolean winCondition ()
+    {
+	for (int x = 0 ; x < gridSize ; x++)
+	    for (int y = 0 ; y < gridSize ; y++)
+		if (!isMine [y] [x])
+		    if (!uncovered [y] [x])
+			return false;
+	return true;
     }
 
 
@@ -319,7 +343,7 @@ public class Minesweeper
 	{
 	    flagged [currentY] [currentX] = true;
 	    c.setColor (Color.yellow);
-	    c.fillRect (currentX * squareSize + 2, currentY * squareSize + 2, squareSize - 3, squareSize - 3);
+	    c.fillRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
 	}
     }
 
@@ -347,6 +371,7 @@ public class Minesweeper
 
 	boolean exit = false;
 	boolean firstClick = true;
+	boolean win = false;
 
 	char input;
 
@@ -388,7 +413,17 @@ public class Minesweeper
 		    firstClick = false;
 
 		    if (click ())
+		    {
+			win = false;
 			exit = true;
+		    }
+
+		    if (winCondition ())
+		    {
+			win = true;
+			exit = true;
+		    }
+
 		    break;
 		case 'P':
 		case 'p':
@@ -398,15 +433,42 @@ public class Minesweeper
 	}
 
 	mt.stop ();
-	result (false);
+
+	if (win)
+	    result (mt.seconds);
+	else
+	{
+	    c.setColor (Color.red);
+
+	    for (int y = 0 ; y < gridSize ; y++)
+	    {
+		for (int x = 0 ; x < gridSize ; x++)
+		{
+		    if (isMine [y] [x] && !uncovered [y] [x])
+			c.fillRect (x * squareSize, y * squareSize, squareSize, squareSize);
+		    else if (flagged [y] [x] && !isMine [y] [x])
+			c.fillRect (x * squareSize + squareSize / 4, y * squareSize + squareSize / 4, squareSize / 2, squareSize / 2);
+		}
+	    }
+	}
+
+	while (true)
+	{
+	    input = c.getChar ();
+	    if (input == 'C' || input == 'c')
+		break;
+	}
+
+	result (-1);
     }
 
 
-    private void result (boolean win)
+
+    private void result (int score)
     {
 	title ("Results", 350, 50);
 
-	if (win)
+	if (score >= 0)
 	    c.print ("you won lol");
 	else
 	    c.print ("wow git gud xD");
@@ -434,6 +496,7 @@ public class Minesweeper
 	    else if (m.menuChoice == 'E' || m.menuChoice == 'e')
 		break;
 	}
+
 
 	m.goodbye ();
     }
