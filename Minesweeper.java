@@ -23,7 +23,7 @@ public class Minesweeper
     boolean vist[] [] = new boolean [SIZE] [SIZE]; //For DFS
     boolean cheating;
 
-    int gridSize, squareSize, mines;
+    int gridSize, squareSize, mines, totalMines;
     int currentX, currentY;
     char menuChoice;
 
@@ -258,6 +258,8 @@ public class Minesweeper
 		adj [y] [x] = count;
 	    }
 	}
+
+	mines = totalMines;
     }
 
 
@@ -321,17 +323,17 @@ public class Minesweeper
 	    case '1':
 		gridSize = 10;
 		squareSize = 60;
-		mines = 20;
+		totalMines = 20;
 		break;
 	    case '2':
 		gridSize = 15;
 		squareSize = 40;
-		mines = 40;
+		totalMines = 40;
 		break;
 	    case '3':
 		gridSize = 20;
 		squareSize = 30;
-		mines = 70;
+		totalMines = 70;
 		break;
 	}
 
