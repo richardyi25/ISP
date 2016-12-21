@@ -25,13 +25,14 @@ public class MyTimer extends Thread
 	    {
 
 	    }
+
 	    ++seconds;
 
 	    c.setColor (Color.white);
 	    c.fillRect (620, 0, 300, 50);
 	    c.setColor (Color.black);
 
-	    Font f = new Font ("Arial", 0, 30);
+	    Font f = new Font ("Comic Sans MS", 0, 30);
 	    c.drawString ("Elapsed Time: " + seconds, 620, 30);
 	}
     }

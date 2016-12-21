@@ -296,7 +296,7 @@ public class Minesweeper
 	c.setColor (Color.orange);
 	for (int y = 0 ; y < gridSize ; y++)
 	    for (int x = 0 ; x < gridSize ; x++)
-		if (isMine [y] [x])
+		if (isMine [y] [x] && !flagged [y] [x])
 		    c.fillRect (x * squareSize + 2, y * squareSize + 2, squareSize - 3, squareSize - 3);
 
 	cheating = true;
@@ -306,7 +306,6 @@ public class Minesweeper
     public void game ()
     {
 	MyTimer mt = new MyTimer (c);
-	mt.start ();
 
 	boolean exit = false;
 	boolean firstClick = true;
@@ -412,7 +411,10 @@ public class Minesweeper
 		case 'O':
 		case 'o':
 		    if (firstClick)
+		    {
 			generate ();
+			mt.start ();
+		    }
 		    firstClick = false;
 
 		    if (click ())
@@ -512,8 +514,8 @@ public class Minesweeper
     {
 	title ("Results", 350, 50);
 
-	if (score >= 0)
-	    c.drawString ("Your time: " + score, 100, 200);
+	if (time >= 0)
+	    c.drawString ("Your time: " + time, 100, 200);
 	else
 	    c.drawString ("You lost!", 100, 200);
 
