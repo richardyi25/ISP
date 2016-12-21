@@ -303,7 +303,8 @@ public class Minesweeper
     }
 
 
-    public void game ()
+
+    public void game () throws IOException
     {
 	MyTimer mt = new MyTimer (c);
 
@@ -360,6 +361,7 @@ public class Minesweeper
 	c.drawString ("the selected square around", 610, 195);
 	c.drawString ("Press O to uncover square", 610, 240);
 	c.drawString ("Press P to flag square", 610, 280);
+	c.drawString ("Press Q to give up", 610, 320);
 
 	for (int y = 0 ; y < gridSize ; y++)
 	{
@@ -479,17 +481,17 @@ public class Minesweeper
 	    }
 
 	    c.setColor (Color.yellow);
-	    c.fillRect (620, 320, 60, 60);
+	    c.fillRect (620, 330, 60, 60);
 	    c.setColor (Color.red);
-	    c.fillRect (636, 336, 30, 30);
-	    c.fillRect (620, 400, 60, 60);
+	    c.fillRect (636, 346, 30, 30);
+	    c.fillRect (620, 410, 60, 60);
 	    c.setColor (Color.green);
-	    c.fillRect (620, 480, 60, 60);
+	    c.fillRect (620, 490, 60, 60);
 
 	    c.setColor (Color.black);
-	    c.drawString ("Incorrectly Flagged", 700, 355);
-	    c.drawString ("Unflagged Mine", 700, 435);
-	    c.drawString ("Correctly Flagged", 700, 515);
+	    c.drawString ("Incorrectly Flagged", 700, 365);
+	    c.drawString ("Unflagged Mine", 700, 445);
+	    c.drawString ("Correctly Flagged", 700, 525);
 	}
 
 	c.setFont (new Font ("Comic Sans MS", 1, 30));
@@ -510,12 +512,28 @@ public class Minesweeper
 
 
 
-    private void result (int time)
+    private void result (int time) throws IOException
     {
 	title ("Results", 350, 50);
+	BufferedReader in;
+	BufferedReader out;
+	String header, name;
+	int scoreNum, score;
 
 	if (time >= 0)
+	{
 	    c.drawString ("Your time: " + time, 100, 200);
+
+	    in = new BufferedReader (new FileReader ("highscores.txt"));
+	    header = in.readLine ();
+	    if (header != "High Scores (DO NOT MODIFY)")
+	    {
+		new Message ("File header invalid. Erasing file");
+	    }
+
+
+	    //scoreNumber = Integer.parseInt ();
+	}
 	else
 	    c.drawString ("You lost!", 100, 200);
 
