@@ -14,7 +14,6 @@ public class MyTimer extends Thread
 
     public void run ()
     {
-	Font f = new Font ("Arial", 0, 30);
 	seconds = 0;
 	while (true)
 	{
@@ -27,10 +26,13 @@ public class MyTimer extends Thread
 
 	    }
 	    ++seconds;
+
 	    c.setColor (Color.white);
-	    c.fillRect (650, 150, 150, 150);
+	    c.fillRect (620, 0, 300, 50);
 	    c.setColor (Color.black);
-	    c.drawString (String.valueOf (seconds), 700, 200);
+
+	    Font f = new Font ("Arial", 0, 30);
+	    c.drawString ("Elapsed Time: " + seconds, 620, 30);
 	}
     }
 }
