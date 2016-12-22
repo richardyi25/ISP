@@ -58,6 +58,7 @@ public class Minesweeper
     {
 	SplashScreen s = new SplashScreen (c);
 	s.start ();
+	s.join ();
     }
 
 
@@ -431,7 +432,7 @@ public class Minesweeper
 	    case '1':
 		gridSize = 10;
 		squareSize = 60;
-		mines = 20;
+		mines = 15;
 		break;
 	    case '2':
 		gridSize = 15;
@@ -631,13 +632,13 @@ public class Minesweeper
 	title ("Results", 350, 50);
 	BufferedReader in;
 	PrintWriter out;
-	String header, newName;
+	String header, newName = "";
 	String fileName = "highscores" + menuChoice + ".txt";
 	int entries;
 	int scores[];
 	String names[];
 	char input;
-
+	boolean exit = false;
 
 	if (time >= 0)
 	{
@@ -645,8 +646,19 @@ public class Minesweeper
 
 	    c.setFont (new Font ("Comic Sans MS", 0, 20));
 	    c.drawString ("Please enter your name: ", 25, 400);
-	    c.setCursor (22, 4);
-	    newName = c.readLine ();
+
+	    while (!exit)
+	    {
+		c.setCursor (22, 4);
+		newName = c.readLine ();
+
+		for (int i = 0 ; i < newName.length () ; i++)
+		    if (newName.charAt (i) != ' ' || newName.charAt (i) != '\n' || newName.charAt (i) != '\t')
+			exit = true;
+
+		if (!exit)
+		    JOptionPane.showMessageDialog (null, "Your name cannot be comprised only of whitespace characters!");
+	    }
 
 	    if (!new File (fileName).exists ())
 	    {
@@ -739,12 +751,12 @@ public class Minesweeper
 	    c.drawString ("You lost!", 100, 200);
 
 	c.setFont (new Font ("Comic Sans MS", 0, 30));
-	c.drawString ("Press enter to continue...", 100, 600);
+	c.drawString ("Press enter or space to continue...", 20, 600);
 
 	while (true)
 	{
 	    input = c.getChar ();
-	    if (input == '\n')
+	    if (input == '\n' || input == ' ')
 		break;
 	}
     }
