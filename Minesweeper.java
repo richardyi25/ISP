@@ -22,7 +22,7 @@ public class Minesweeper
     boolean uncovered[] [] = new boolean [SIZE] [SIZE];
     boolean flagged[] [] = new boolean [SIZE] [SIZE];
     boolean vist[] [] = new boolean [SIZE] [SIZE]; //For DFS
-    boolean cheating;
+    boolean gameStarted, cheating;
 
     int gridSize, squareSize, mines, totalMines;
     int currentX, currentY;
@@ -105,10 +105,105 @@ public class Minesweeper
     }
 
 
-    public void highScores ()
+    public void highScores () throws IOException
     {
+	int entries;
+	String header;
+	int scores[];
+	String names[];
+	BufferedReader in = new BufferedReader (new FileReader ("highscores.txt"));
+	PrintWriter out;
+
 	title ("High Scores", 300, 50);
-	pauseProgram (500);
+
+	if (!new File ("highscores.txt").exists ())
+	{
+	    JOptionPane.showMessageDialog (null, "File not found. Creating new file.");
+
+	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+	    out.println ("High Scores (DO NOT MODIFY)");
+	    out.println ("0");
+	    out.close ();
+	    return;
+	}
+
+	header = in.readLine ();
+
+	if (header == null || !header.equals ("High Scores (DO NOT MODIFY)"))
+	{
+	    JOptionPane.showMessageDialog (null, "File header invalid. Erasing file.");
+
+	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+	    out.println ("High Scores (DO NOT MODIFY)");
+	    out.println ("0");
+	    out.close ();
+	    return;
+	}
+
+	try
+	{
+	    entries = Integer.parseInt (in.readLine ());
+	    names = new String [entries];
+	    scores = new int [entries];
+	    String tempName;
+	    int tempScore;
+
+	    for (int i = 0 ; i < entries ; i++)
+	    {
+		names [i] = in.readLine ();
+		scores [i] = Integer.parseInt (in.readLine ());
+	    }
+
+	    //bubblesort
+	    for (int i = entries - 1 ; i > 0 ; i--)
+	    {
+		for (int j = 0 ; j < i ; j++)
+		{
+		    if (scores [j] > scores [j + 1])
+		    {
+			tempScore = scores [j];
+			tempName = names [j];
+
+			scores [j] = scores [j + 1];
+			names [j] = names [j + 1];
+
+			scores [j + 1] = tempScore;
+			names [j + 1] = tempName;
+		    }
+		}
+	    }
+
+	    c.setFont (new Font ("Comic Sans MS", 0, 20));
+	    for (int i = 0 ; i < Math.min (entries, 10) ; i++)
+	    {
+		c.drawString (names [i], 20, i * 40 + 120);
+		c.drawString (String.valueOf (scores [i]), 700, i * 40 + 100);
+	    }
+	}
+	catch (NumberFormatException e)
+	{
+	    JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
+	    in.close ();
+
+	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+	    out.println ("High Scores (DO NOT MODIFY)");
+	    out.println ("0");
+	    out.close ();
+	    return;
+	}
+	catch (NullPointerException e)
+	{
+	    JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
+	    in.close ();
+
+	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+	    out.println ("High Scores (DO NOT MODIFY)");
+	    out.println ("0");
+	    out.close ();
+	    return;
+	}
+
+	pauseProgram (600);
     }
 
 
@@ -260,13 +355,13 @@ public class Minesweeper
 	    }
 	}
 
-	mines = totalMines;
+	gameStarted = true;
     }
 
 
     private void flag ()
     {
-	if (uncovered [currentY] [currentX])
+	if (uncovered [currentY] [currentX] || !gameStarted)
 	    return;
 	if (flagged [currentY] [currentX])
 	{
@@ -319,22 +414,24 @@ public class Minesweeper
 
 	c.clear ();
 
+	gameStarted = false;
+
 	switch (menuChoice)
 	{
 	    case '1':
 		gridSize = 10;
 		squareSize = 60;
-		totalMines = 20;
+		mines = 20;
 		break;
 	    case '2':
 		gridSize = 15;
 		squareSize = 40;
-		totalMines = 40;
+		mines = 40;
 		break;
 	    case '3':
 		gridSize = 20;
 		squareSize = 30;
-		totalMines = 70;
+		mines = 70;
 		break;
 	}
 
@@ -523,53 +620,104 @@ public class Minesweeper
 	title ("Results", 350, 50);
 	BufferedReader in;
 	PrintWriter out;
-	String name, newName;
-	int scoreNum, score;
+	String header, newName;
+	int entries;
 	int scores[];
+	String names[];
+	char input;
 
-
-	c.setFont (new Font ("Comic Sans MS", 0, 20));
-	c.drawString ("Please enter your name: ", 20, 400);
-	c.setCursor (10, 1);
-	newName = c.readLine ();
 
 	if (time >= 0)
 	{
 	    c.drawString ("Your time: " + time, 100, 200);
 
+	    c.setFont (new Font ("Comic Sans MS", 0, 20));
+	    c.drawString ("Please enter your name: ", 25, 400);
+	    c.setCursor (22, 4);
+	    newName = c.readLine ();
+
 	    if (!new File ("highscores.txt").exists ())
 	    {
-		JOptionPane.showMessageDialog (null, "No file found. Creating new file");
+		JOptionPane.showMessageDialog (null, "No file found. Creating new file.");
 		out = new PrintWriter (new FileWriter ("highscores.txt"));
-
-
 
 		out.println ("High Scores (DO NOT MODIFY)");
 		out.println ("1");
+		out.println (newName);
+		out.println (time);
 		out.close ();
 	    }
 	    else
 	    {
 		in = new BufferedReader (new FileReader ("highscores.txt"));
+		header = in.readLine ();
 
-		if (!in.readLine ().equals ("High Scores (DO NOT MODIFY)"))
+		if (header == null || !header.equals ("High Scores (DO NOT MODIFY)"))
 		{
 		    JOptionPane.showMessageDialog (null, "File header invalid. Erasing file.");
 
 		    in.close ();
 
 		    out = new PrintWriter (new FileWriter ("highscores.txt"));
+		    out.println ("High Scores (DO NOT MODIFY)");
+		    out.println ("1");
+		    out.println (newName);
+		    out.println (time);
+		    out.close ();
 		}
 		else
 		{
+		    out = new PrintWriter (new FileWriter ("highscores.txt"));
+
 		    try
 		    {
-			name = in.readLine ();
-			//socreNum = Integer.parseInt (
+			entries = Integer.parseInt (in.readLine ());
+			scores = new int [entries];
+			names = new String [entries];
+
+			for (int i = 0 ; i < entries ; i++)
+			{
+			    names [i] = in.readLine ();
+			    scores [i] = Integer.parseInt (in.readLine ());
+			}
+
+			in.close ();
+
+			out.println ("High Scores (DO NOT MODIFY)");
+			out.println (entries + 1);
+			for (int i = 0 ; i < entries ; i++)
+			{
+			    out.println (names [i]);
+			    out.println (scores [i]);
+			}
+			out.println (newName);
+			out.println (time);
+
+			out.close ();
 		    }
 		    catch (NumberFormatException e)
 		    {
-			JOptionPane.showMessageDialog (null, "Corrupted or invalid input high scores file.");
+			JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
+			in.close ();
+
+			out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+			out.println ("High Scores (DO NOT MODIFY)");
+			out.println ("1");
+			out.println (newName);
+			out.println (time);
+			out.close ();
+		    }
+		    catch (NullPointerException e)
+		    {
+			JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
+			in.close ();
+
+			out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+			out.println ("High Scores (DO NOT MODIFY)");
+			out.println ("1");
+			out.println (newName);
+			out.println (time);
+			out.close ();
 		    }
 		}
 
@@ -578,7 +726,15 @@ public class Minesweeper
 	else
 	    c.drawString ("You lost!", 100, 200);
 
-	pauseProgram (500);
+	c.setFont (new Font ("Comic Sans MS", 0, 30));
+	c.drawString ("Press enter to continue...", 100, 600);
+
+	while (true)
+	{
+	    input = c.getChar ();
+	    if (input == '\n')
+		break;
+	}
     }
 
 
