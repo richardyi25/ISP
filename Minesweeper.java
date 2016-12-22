@@ -638,7 +638,7 @@ public class Minesweeper
 	int scores[];
 	String names[];
 	char input;
-	boolean exit = false;
+	boolean charsOK = false;
 
 	if (time >= 0)
 	{
@@ -647,17 +647,26 @@ public class Minesweeper
 	    c.setFont (new Font ("Comic Sans MS", 0, 20));
 	    c.drawString ("Please enter your name: ", 25, 400);
 
-	    while (!exit)
+	    while (true)
 	    {
 		c.setCursor (22, 4);
+		c.println ();
+		c.setCursor (22, 4);
+
 		newName = c.readLine ();
 
 		for (int i = 0 ; i < newName.length () ; i++)
-		    if (newName.charAt (i) != ' ' || newName.charAt (i) != '\n' || newName.charAt (i) != '\t')
-			exit = true;
+		    if (newName.charAt (i) != ' ' || newName.charAt (i) != '\n')
+			charsOK = true;
 
-		if (!exit)
-		    JOptionPane.showMessageDialog (null, "Your name cannot be comprised only of whitespace characters!");
+		if (newName.length () > 32)
+		    JOptionPane.showMessageDialog (null, "Your name cannot be longer than 32 characters!");
+
+		if (!charsOK)
+		    JOptionPane.showMessageDialog (null, "Your name cannot be comprised only of whitespace characters");
+
+		if (!(newName.length () > 32 || !charsOK))
+		    break;
 	    }
 
 	    if (!new File (fileName).exists ())
