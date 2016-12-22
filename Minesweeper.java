@@ -187,7 +187,7 @@ public class Minesweeper
 		for (int i = 0 ; i < Math.min (entries, 10) ; i++)
 		{
 		    c.drawString (names [i], 20, i * 40 + 120);
-		    c.drawString (String.valueOf (scores [i]), 700, i * 40 + 100);
+		    c.drawString (String.valueOf (scores [i]), 700, i * 40 + 120);
 		}
 	    }
 	    catch (NumberFormatException e)
@@ -786,6 +786,3 @@ public class Minesweeper
 	m.goodbye ();
     }
 }
-
-
-
