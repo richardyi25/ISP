@@ -111,99 +111,109 @@ public class Minesweeper
 	String header;
 	int scores[];
 	String names[];
-	BufferedReader in = new BufferedReader (new FileReader ("highscores.txt"));
+	String difficulty[] = {"Easy", "Medium", "Hard"};
+	String fileName;
+	BufferedReader in;
 	PrintWriter out;
 
-	title ("High Scores", 300, 50);
 
-	if (!new File ("highscores.txt").exists ())
+	for (int n = 1 ; n <= 3 ; n++)
 	{
-	    JOptionPane.showMessageDialog (null, "File not found. Creating new file.");
+	    title ("High Scores - " + difficulty [n - 1], 20, 50);
 
-	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
-	    out.println ("High Scores (DO NOT MODIFY)");
-	    out.println ("0");
-	    out.close ();
-	    return;
-	}
+	    fileName = "highscores" + String.valueOf (n) + ".txt";
 
-	header = in.readLine ();
-
-	if (header == null || !header.equals ("High Scores (DO NOT MODIFY)"))
-	{
-	    JOptionPane.showMessageDialog (null, "File header invalid. Erasing file.");
-
-	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
-	    out.println ("High Scores (DO NOT MODIFY)");
-	    out.println ("0");
-	    out.close ();
-	    return;
-	}
-
-	try
-	{
-	    entries = Integer.parseInt (in.readLine ());
-	    names = new String [entries];
-	    scores = new int [entries];
-	    String tempName;
-	    int tempScore;
-
-	    for (int i = 0 ; i < entries ; i++)
+	    if (!new File (fileName).exists ())
 	    {
-		names [i] = in.readLine ();
-		scores [i] = Integer.parseInt (in.readLine ());
+		JOptionPane.showMessageDialog (null, "File not found. Creating new file.");
+
+		out = new PrintWriter (new FileWriter (fileName)); //reset file
+		out.println ("High Scores (DO NOT MODIFY)");
+		out.println ("0");
+		out.close ();
+		continue;
 	    }
 
-	    //bubblesort
-	    for (int i = entries - 1 ; i > 0 ; i--)
+	    in = new BufferedReader (new FileReader (fileName));
+
+	    header = in.readLine ();
+
+	    if (header == null || !header.equals ("High Scores (DO NOT MODIFY)"))
 	    {
-		for (int j = 0 ; j < i ; j++)
+		JOptionPane.showMessageDialog (null, "File header invalid. Erasing file.");
+
+		out = new PrintWriter (new FileWriter (fileName)); //reset file
+		out.println ("High Scores (DO NOT MODIFY)");
+		out.println ("0");
+		out.close ();
+		continue;
+	    }
+
+	    try
+	    {
+		entries = Integer.parseInt (in.readLine ());
+		names = new String [entries];
+		scores = new int [entries];
+		String tempName;
+		int tempScore;
+
+		for (int i = 0 ; i < entries ; i++)
 		{
-		    if (scores [j] > scores [j + 1])
+		    names [i] = in.readLine ();
+		    scores [i] = Integer.parseInt (in.readLine ());
+		}
+
+		//bubblesort
+		for (int i = entries - 1 ; i > 0 ; i--)
+		{
+		    for (int j = 0 ; j < i ; j++)
 		    {
-			tempScore = scores [j];
-			tempName = names [j];
+			if (scores [j] > scores [j + 1])
+			{
+			    tempScore = scores [j];
+			    tempName = names [j];
 
-			scores [j] = scores [j + 1];
-			names [j] = names [j + 1];
+			    scores [j] = scores [j + 1];
+			    names [j] = names [j + 1];
 
-			scores [j + 1] = tempScore;
-			names [j + 1] = tempName;
+			    scores [j + 1] = tempScore;
+			    names [j + 1] = tempName;
+			}
 		    }
 		}
-	    }
 
-	    c.setFont (new Font ("Comic Sans MS", 0, 20));
-	    for (int i = 0 ; i < Math.min (entries, 10) ; i++)
+		c.setFont (new Font ("Comic Sans MS", 0, 20));
+		for (int i = 0 ; i < Math.min (entries, 10) ; i++)
+		{
+		    c.drawString (names [i], 20, i * 40 + 120);
+		    c.drawString (String.valueOf (scores [i]), 700, i * 40 + 100);
+		}
+	    }
+	    catch (NumberFormatException e)
 	    {
-		c.drawString (names [i], 20, i * 40 + 120);
-		c.drawString (String.valueOf (scores [i]), 700, i * 40 + 100);
+		JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
+		in.close ();
+
+		out = new PrintWriter (new FileWriter (fileName)); //reset file
+		out.println ("High Scores (DO NOT MODIFY)");
+		out.println ("0");
+		out.close ();
+		continue;
 	    }
-	}
-	catch (NumberFormatException e)
-	{
-	    JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
-	    in.close ();
+	    catch (NullPointerException e)
+	    {
+		JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
+		in.close ();
 
-	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
-	    out.println ("High Scores (DO NOT MODIFY)");
-	    out.println ("0");
-	    out.close ();
-	    return;
-	}
-	catch (NullPointerException e)
-	{
-	    JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
-	    in.close ();
+		out = new PrintWriter (new FileWriter (fileName)); //reset file
+		out.println ("High Scores (DO NOT MODIFY)");
+		out.println ("0");
+		out.close ();
+		continue;
+	    }
 
-	    out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
-	    out.println ("High Scores (DO NOT MODIFY)");
-	    out.println ("0");
-	    out.close ();
-	    return;
+	    pauseProgram (600);
 	}
-
-	pauseProgram (600);
     }
 
 
@@ -540,6 +550,7 @@ public class Minesweeper
 		case 'c':
 		    cheat ();
 		    break;
+		case 'X':
 		case 'x':
 		    win = true;
 		    exit = true;
@@ -621,6 +632,7 @@ public class Minesweeper
 	BufferedReader in;
 	PrintWriter out;
 	String header, newName;
+	String fileName = "highscores" + menuChoice + ".txt";
 	int entries;
 	int scores[];
 	String names[];
@@ -636,10 +648,10 @@ public class Minesweeper
 	    c.setCursor (22, 4);
 	    newName = c.readLine ();
 
-	    if (!new File ("highscores.txt").exists ())
+	    if (!new File (fileName).exists ())
 	    {
 		JOptionPane.showMessageDialog (null, "No file found. Creating new file.");
-		out = new PrintWriter (new FileWriter ("highscores.txt"));
+		out = new PrintWriter (new FileWriter (fileName));
 
 		out.println ("High Scores (DO NOT MODIFY)");
 		out.println ("1");
@@ -649,7 +661,7 @@ public class Minesweeper
 	    }
 	    else
 	    {
-		in = new BufferedReader (new FileReader ("highscores.txt"));
+		in = new BufferedReader (new FileReader (fileName));
 		header = in.readLine ();
 
 		if (header == null || !header.equals ("High Scores (DO NOT MODIFY)"))
@@ -658,7 +670,7 @@ public class Minesweeper
 
 		    in.close ();
 
-		    out = new PrintWriter (new FileWriter ("highscores.txt"));
+		    out = new PrintWriter (new FileWriter (fileName));
 		    out.println ("High Scores (DO NOT MODIFY)");
 		    out.println ("1");
 		    out.println (newName);
@@ -667,7 +679,7 @@ public class Minesweeper
 		}
 		else
 		{
-		    out = new PrintWriter (new FileWriter ("highscores.txt"));
+		    out = new PrintWriter (new FileWriter (fileName));
 
 		    try
 		    {
@@ -700,7 +712,7 @@ public class Minesweeper
 			JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
 			in.close ();
 
-			out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+			out = new PrintWriter (new FileWriter (fileName)); //reset file
 			out.println ("High Scores (DO NOT MODIFY)");
 			out.println ("1");
 			out.println (newName);
@@ -712,7 +724,7 @@ public class Minesweeper
 			JOptionPane.showMessageDialog (null, "Invalid input high scores file. Erasing file.");
 			in.close ();
 
-			out = new PrintWriter (new FileWriter ("highscores.txt")); //reset file
+			out = new PrintWriter (new FileWriter (fileName)); //reset file
 			out.println ("High Scores (DO NOT MODIFY)");
 			out.println ("1");
 			out.println (newName);
