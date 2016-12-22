@@ -10,6 +10,7 @@ This program is a minesweeper game.
 import hsa.*;
 import java.awt.*;
 import java.io.*;
+import javax.swing.JOptionPane;
 
 public class Minesweeper
 {
@@ -440,6 +441,10 @@ public class Minesweeper
 		case 'c':
 		    cheat ();
 		    break;
+		case 'x':
+		    win = true;
+		    exit = true;
+		    break;
 	    }
 	}
 
@@ -511,28 +516,62 @@ public class Minesweeper
     }
 
 
-
     private void result (int time) throws IOException
     {
 	title ("Results", 350, 50);
 	BufferedReader in;
-	BufferedReader out;
-	String header, name;
+	PrintWriter out;
+	String name, newName;
 	int scoreNum, score;
+	int scores[];
+
+
+	c.setFont (new Font ("Comic Sans MS", 0, 20));
+	c.drawString ("Please enter your name: ", 20, 400);
+	c.setCursor (10, 1);
+	newName = c.readLine ();
 
 	if (time >= 0)
 	{
 	    c.drawString ("Your time: " + time, 100, 200);
 
-	    in = new BufferedReader (new FileReader ("highscores.txt"));
-	    header = in.readLine ();
-	    if (header != "High Scores (DO NOT MODIFY)")
+	    if (!new File ("highscores.txt").exists ())
 	    {
-		new Message ("File header invalid. Erasing file");
+		JOptionPane.showMessageDialog (null, "No file found. Creating new file");
+		out = new PrintWriter (new FileWriter ("highscores.txt"));
+
+
+
+		out.println ("High Scores (DO NOT MODIFY)");
+		out.println ("1");
+		out.close ();
 	    }
+	    else
+	    {
+		in = new BufferedReader (new FileReader ("highscores.txt"));
 
+		if (!in.readLine ().equals ("High Scores (DO NOT MODIFY)"))
+		{
+		    JOptionPane.showMessageDialog (null, "File header invalid. Erasing file.");
 
-	    //scoreNumber = Integer.parseInt ();
+		    in.close ();
+
+		    out = new PrintWriter (new FileWriter ("highscores.txt"));
+		}
+		else
+		{
+		    try
+		    {
+			name = in.readLine ();
+			//socreNum = Integer.parseInt (
+		    }
+		    catch (NumberFormatException e)
+		    {
+			JOptionPane.showMessageDialog (null, "Corrupted or invalid input high scores file.");
+		    }
+		}
+
+	    }
 	}
 	else
 	    c.drawString ("You lost!", 100, 200);
