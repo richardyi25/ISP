@@ -26,12 +26,15 @@ public class SplashScreen extends Thread
     private void drawFlag (int x, int y)
     {
 	c.setColor (Color.black);
-	for (int i = 0 ; i < 10 ; i++)
-	    c.drawLine (x + i, y, x + i, y + 20);
+	for (int i = 0 ; i <= 5 ; i++)
+	    c.drawLine (x + i, y, x + i, y + 25);
 
 	c.fillRect (x, y, 5, 20);
 
 	c.setColor (Color.red);
+
+	for (int i = 5 ; i < 20 ; i++)
+	    c.drawLine (x + 5, y + 10, x + i, y);
     }
 
 
@@ -55,12 +58,12 @@ public class SplashScreen extends Thread
 	    c.drawLine (450, 300, (int) (450 + 250 * Math.cos (prevAngle)), (int) (300 + 250 * Math.sin (prevAngle)));
 	    c.setColor (Color.green);
 	    c.drawLine (450, 300, (int) (450 + 250 * Math.cos (angle)), (int) (300 + 250 * Math.sin (angle)));
-	    delay (1);
 
+	    if (Math.abs (i - 5) < 0.0001)
+		drawFlag (600, 200);
 	}
 
-	drawFlag (100, 200);
-	delay(1000);
+	c.getChar ();
 
     }
 }
