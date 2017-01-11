@@ -4,7 +4,61 @@ Richard Yi
 Mrs. Krasteva
 ISP (Minesweeper)
 
-This program is a minesweeper game.
+This program is a minesweeper game with 3 difficulties that have increasing grid sizes and mine densities.
+
+On launching the program, a splash screen animation appears.
+The program then automatically goes to the main menu.
+The user has an option to play one of the three difficulties,
+view instructions, view high scores, or exit the program.
+
+If the user chooses to play one of the difficulties, they will be playing the game
+until they either win, lose, or give up
+They are then brought to the results screen, which tells them the result of their game.
+If they won, they are asked to enter their name which will be saved to the high scores file
+corresponding to the difficulty they played in.
+They are then brought back to the main menu.
+
+If the user chooses to view instructions, they will view a screen that briefly explains
+the concepts, mechanics of Minesweeper as well as controls for the game.
+They are then brought back to the main menu.
+
+If the user chooses to view high scores, they view the top 10 scores for the three difficulties, respectively.
+They are then brought back to the main menu.
+
+If the user chooses the exit, the console window closes, and the program halts.
+
+
+
+
+===IMPORTANT DEBUG INFORMATION===
+When in game:
+-Press C to reveal all mines
+-Press X to instantly win
+=================================
+
+
+
+
+Global Variables:
+
+	       Name               Type                                                         Description
+======================================================================================================================================
+		c              hsa.Console                           A console that provides an input/output interface with the user
+	       SIZE             final int                               The maximum size that the grid array dimensions can hold
+	      isMine           boolean[][]                                      Stores whether the square at [y][x] is a mine
+	       adj               int[][]                                            Stores the number of adjacent mines
+	    uncovered          boolean[][]                                   Stores whether the square at [y][x] is uncovered
+	     flagged           boolean[][]                                    Stores whether the square at [y][x] is flagged
+	       vist            boolean[][]                  Stores whether the square at [y][x] has been visited during the Depth-First Search
+	   gameStarted           boolean                 Whether or not the game has started (the game starts when the user uncovers the first square)
+	     cheating            boolean                    Whether or not the user is cheating (by pressing C to reveal the location of all mines)
+	     gridSize              int                                     The side length of the grid for the current difficulty
+	    squareSize             int                           The side length (in pixels) of a grid square for the current difficulty
+	      mines                int                                  The number of mines remaining (that have not been flagged)
+	    totalMines             int                             The total number of mines within the grid for the current difficulty
+	     currentX              int                                  The current X-coordinate of the user's cursor in the grid
+	     currentY              int                                  The current Y-coordinate of the user's cursor in the grid
+	    menuChoice             int                                          Stores the user's choice in the main menu
 */
 
 import hsa.*;
@@ -36,6 +90,10 @@ public class Minesweeper
     }
 
 
+    /*
+    Title Method
+    Clears the screen and draws a title at a specific X and Y coordinate pair
+    */
     private void title (String text, int x, int y)
     {
 	c.clear ();
@@ -45,15 +103,28 @@ public class Minesweeper
     }
 
 
+    /*
+    Pause-program Method
+    Pauses the program and draws a prompt text at a specific Y-coordinate
+    */
     private void pauseProgram (int y)
     {
 	c.setFont (new Font ("Comic Sans MS", 0, 30));
 	c.setColor (Color.black);
-	c.drawString ("Press any key to continue...", 69, y);
+	c.drawString ("Press any key to continue...", 50, y);
 	c.getChar ();
     }
 
 
+    /*
+    Splash Screen Method
+    Starts and joins the SplashScreen Thread, passing the current Console
+
+    Local Variables
+
+		    Name                Type                            Description
+		     s              SplashScreen    Thread that displays the splash screen when started
+    */
     public void splashScreen () throws InterruptedException
     {
 	SplashScreen s = new SplashScreen (c);
@@ -62,6 +133,23 @@ public class Minesweeper
     }
 
 
+    /*
+    Main Menu Method
+
+    Prompts the user for what part of the game they want to navigate to.
+    The program keeps accepting a character until they type one of the characters
+    corresponding to a part of the game (1, 2, 3, Q, W, or E, as well as q, w, or e)
+
+    Control Flow
+    ============
+    Conditional Loop #1:
+	Gets a character.
+	This loop exits when the user enters a valid character
+	(1, 2, 3, Q, W, E, q, w, or e)
+
+	Switch Statement #1:
+	    For any of the cases: {1, 2, 3, q, w, e, Q, W, E}, break the loop
+    */
     public void mainMenu ()
     {
 	title ("Minesweeper", 285, 50);
@@ -75,7 +163,6 @@ public class Minesweeper
 	c.drawString ("Press Q for help and instructions", 10, 250);
 	c.drawString ("Press W to see high scores", 10, 300);
 	c.drawString ("Press E to quit", 10, 350);
-	//change to button format if you have time
 
 	while (true)
 	{
@@ -98,6 +185,11 @@ public class Minesweeper
     }
 
 
+    /*
+    Instructions Screen Method
+
+    Displays the rules and mechanics of Minesweeper as well as the controls for this game.
+    */
     public void instructions ()
     {
 	title ("Instructions", 285, 50);
@@ -106,6 +198,59 @@ public class Minesweeper
     }
 
 
+    /*
+    High Scores Method
+
+    Shows the 10 highest scores for each difficulty.
+    If any highscore file is invalid, it is reset.
+
+    Local Variables
+
+			Name                                Type                                        Description
+    ==========================================================================================================================================
+		      entries                               int                        The number of entries (name and score) in a file
+		       header                              String                   The first line of the file (should be the file header)
+		       scores                              int[]                               The scores contained in the file
+		       names                              String[]                              The names contained in the file
+		     difficulty                           String[]                                The name of each difficulty
+		      fileName                             String                               The name of the file being read
+			in                             BufferedReader                            Object for reading the file
+			out                              PrintWriter                           Object for writing to the file
+
+    Control Flow
+    ============
+    Counted Loop #1:
+	Loop 3 times for the 3 diffiulties
+
+
+	Conditional #1:
+	    Checks if the highscore file exists
+	    If it doesn't, reset the file
+
+	Conditional #2:
+	    If there is no header or there is an invalid header, reset the file
+
+	Exception Handler #1:
+	    Initialize the size of names and scores
+	    Attempt to read the data, and then sort it
+
+	    If a conversion fails (NumberFormatException) or there is no input when it is attempted
+	    to be read (NullPointerException), give up and reset the file
+
+
+	    Counted Loop #1:
+		Read in the entries of the file in a loop
+
+	    Counted Loop #2:
+		Counted Loop #3:
+		    An standard unoptimized implementation of Bubblesort
+		    From 1 .. N - 1, then 1 .. N - 2, then 1 .. N - 3
+		    and so on, if A[N] > A[N + 1], swap them
+
+	    Counted Loop #4:
+		Display the top 10 entries
+		If there are less than 10 entries, display all of them
+    */
     public void highScores () throws IOException
     {
 	int entries;
@@ -218,6 +363,10 @@ public class Minesweeper
     }
 
 
+    /*
+    Goodbye Method
+    Thanks the user for using the program and closes the console window.
+    */
     public void goodbye ()
     {
 	title ("Minesweeper", 285, 50);
@@ -233,6 +382,8 @@ public class Minesweeper
     }
 
 
+
+    //Redraws the cursor at the current coordiantes
     private void redrawCursor ()
     {
 	c.setColor (Color.red);
@@ -241,20 +392,43 @@ public class Minesweeper
     }
 
 
-    private void moveSelected (int dx, int dy)
+    /*
+    Move the cursor a certain number of squares on the X and Y axes.
+
+
+    Local Variables(Paramaters)
+
+	       Name         Type                  Description
+    ===================================================================
+	      deltaX        int         The change in the X coordiante
+	      deltaY        int         The change in the Y coordinate
+
+    Control Flow
+    ============
+    Conditional #1:
+	If the current X-coordinate is less than 0, set it to 0
+	If the current X-coordinate is more than the maximum, set it to the maximum
+
+    Conditional #2:
+	If the current Y-coordinate is less than 0, set it to 0
+	If the current Y-coordinate is more than the maximum, set it to the maximum
+
+    */
+    private void moveSelected (int deltaX, int deltaY)
     {
 	c.setColor (Color.black);
 	c.drawRect (currentX * squareSize, currentY * squareSize, squareSize, squareSize);
 	c.setColor (Color.white);
 	c.drawRect (currentX * squareSize + 1, currentY * squareSize + 1, squareSize - 2, squareSize - 2);
 
-	currentX += dx;
-	currentY += dy;
+	currentX += deltaX;
+	currentY += deltaY;
 
 	if (currentX < 0)
 	    currentX = 0;
 	else if (currentX >= gridSize)
 	    currentX = gridSize - 1;
+
 	if (currentY < 0)
 	    currentY = 0;
 	else if (currentY >= gridSize)
@@ -266,6 +440,22 @@ public class Minesweeper
     }
 
 
+    /*
+    Uncovers a square at the x and y coordinates specified.
+
+    Local Variables(Paramaters)
+
+	       Name         Type                          Description
+    ==================================================================================
+		x           int             X-coordinate of the square to be uncovered
+		y           int             Y-coordinate of the square to be uncovered
+
+    Control Flow
+    ============
+
+    Conditional #1:
+	If the number of adjacent mines to the square sepcified is more than 0, display that number at the square (centered)
+    */
     private void uncover (int x, int y)
     {
 	uncovered [y] [x] = true;
@@ -283,6 +473,32 @@ public class Minesweeper
     }
 
 
+    /*
+    A depth first search for computing how the squares are uncovered
+    if a user chooses to uncover a mine that has 0 adjacent mines
+
+    First, set the current location to visited and uncover it
+
+	       Name         Type                                   Description
+    ===========================================================================================
+		x           int             X-coordinate of the current square in the traversal
+		y           int             Y-coordinate of the current square in the traversal
+
+    Control Flow
+    ============
+
+    Counted Loop #1:
+	Counted Loop #2:
+	    Check all the adjacent cells (With an X and Y coordinate one less, the same, or one more the the original)
+
+	    Conditional #1:
+		If the cell is within the grid, isn't a mine, and hasn't been visited in the DFS before
+
+		Conditional #2:
+		    If the cell does have adjacent mines, just uncover it but don't recurse
+		Conditional #3:
+		    If the cell has no adjacent mines, call this method on the new coordinates
+    */
     private void DFS (int x, int y)
     {
 	vist [y] [x] = true;
@@ -301,11 +517,29 @@ public class Minesweeper
     }
 
 
+    /*
+    What happens when the user "clicks" on a mine.
+    Returns true if the user loses on the click.
+
+    Control Flow
+    ============
+
+    Conditional #1:
+	If the current location of the cursor is a flag, do nothing (return false).
+    Conditional #2:
+	If the current location is a mine, return true, signifying the user has lost.
+    Conditinoal #3:
+	If the current location has been uncovered, do nothing (return false).
+    Conditional #4:
+	If the current locaiton has (an) adjacent mine(s), uncover the square at the current location
+    Conditional #5:
+	Otherwise, it means there are no mines around it, so reset the vist[][] array and preform a DFS at the current location
+    */
     private boolean click ()
     {
 	if (flagged [currentY] [currentX])
 	    return false;
-	if (isMine [currentY] [currentX])
+	else if (isMine [currentY] [currentX])
 	    return true;
 	else if (uncovered [currentY] [currentX])
 	    return false;
@@ -323,23 +557,74 @@ public class Minesweeper
     }
 
 
+    /*
+    Check if the user has won.
+
+    Control Flow
+    ============
+
+    Counted Loop #1:
+	Counted Loop #2:
+	    For each square in the grid,
+	    Conditinoal #1:
+		If the square is not a mine and hasn't been uncovered,
+		it means the user hasn't won yet, so return false
+
+    If the nested loops finish without returning, all non-mines have been accounted for
+    and the user wins, so return true.
+    */
     public boolean winCondition ()
     {
 	for (int x = 0 ; x < gridSize ; x++)
 	    for (int y = 0 ; y < gridSize ; y++)
-		if (!isMine [y] [x])
-		    if (!uncovered [y] [x])
-			return false;
+		if (!isMine [y] [x] && !uncovered [y] [x])
+		    return false;
 	return true;
     }
 
 
+    /*
+    Randomly generates the mines.
+    It is called when the user uncovers his first square)
+
+    Local Variables
+
+	       Name                 Type                                   Description
+    ===========================================================================================
+	     generated              int                          Number of mines generated so far
+	      randomX               int                               A random X-coordinate
+	      randomY               int                               A random X-coordinate
+	       count                int                    Temporarily holds the number of adjacent mines
+
+    Control Flow
+    ============
+
+    Conditional Loop #1:
+	Keeps looping until there are enough mines generated
+
+	Conditional #1:
+	    If the random coordinate is not adjacent to the current coordinate (where the user clicked) and it is not already a mine,
+	    set that coordinate to a mine, and increment the number of mines generated
+
+    Counted Loop #1:
+	Counted Loop #2:
+	    For each square in the grid
+
+	    Counted Loop #3:
+		Counted Loop #4:
+		    For each adjacent square
+
+		    Conditional #2:
+			If the adjacent square is in the grid bounds, and there's a mine there, add one to count
+
+    */
     private void generate ()
     {
-	int i = 0;
+	int generated = 0;
 	int randomX, randomY;
+	int count;
 
-	while (i < mines)
+	while (generated < mines)
 	{
 	    randomX = (int) (Math.random () * gridSize);
 	    randomY = (int) (Math.random () * gridSize);
@@ -347,17 +632,16 @@ public class Minesweeper
 	    if ((Math.abs (randomX - currentX) > 1 || Math.abs (randomY - currentY) > 1) && !isMine [randomY] [randomX])
 	    {
 		isMine [randomY] [randomX] = true;
-		++i;
+		++generated;
 	    }
 	}
 
-	int count;
 	for (int y = 0 ; y < gridSize ; y++)
 	{
 	    for (int x = 0 ; x < gridSize ; x++)
 	    {
 		count = 0;
-		for (i = -1 ; i <= 1 ; i++)
+		for (int i = -1 ; i <= 1 ; i++)
 		    for (int j = -1 ; j <= 1 ; j++)
 			if (y + i >= 0 && y + i < gridSize && x + j >= 0 && x + j < gridSize && isMine [y + i] [x + j])
 			    ++count;
@@ -365,11 +649,23 @@ public class Minesweeper
 		adj [y] [x] = count;
 	    }
 	}
-
-	gameStarted = true;
     }
 
 
+    /*
+    Flags a mine (triggered when the user presses P on a square)
+
+    Control Flow
+    ============
+    Conditional #1:
+	 If the square is already uncovered, or the game hasn't started yet, do nothing (return)
+    Conditional #2:
+	 If the square is already flagged, change the flagged status to false, and change it back to gray
+	(or to orange if cheat mode is activated)
+	Also, increment the number of mines
+    Otherwise (if the square isn't flagged),
+	Make the square flagged by setting the array element and changing the color
+    */
     private void flag ()
     {
 	if (uncovered [currentY] [currentX] || !gameStarted)
@@ -395,11 +691,24 @@ public class Minesweeper
 	c.setColor (Color.white);
 	c.fillRect (620, 50, 300, 50);
 	c.setColor ((mines >= 0) ? Color.black:
-	Color.red);
+	Color.red); //ternary operator
 	c.drawString ("Mines Left: " + mines, 620, 80);
     }
 
 
+    /*
+    Activates cheat mode
+
+    Control Flow
+    ============
+
+    Counted Loop #1:
+	Counted Loop #2:
+	    For each square in the grid
+
+	    Conditional #1:
+		If it's a mine and hasn't been flagged, make it orange
+    */
     private void cheat ()
     {
 	c.setColor (Color.orange);
@@ -412,15 +721,88 @@ public class Minesweeper
     }
 
 
+    /*
+    Game method.
+    Initializes the game variables and handles all keypresses made throughout the game.
 
+	    Name                 Type                                             Description
+    ============================================================================================================================
+	     mt                 MyTimer          Starts the timer that keeps track, and tells the user how much time has elapsed
+	    exit                boolean                       Controls whether or not the while loop below exits
+	    win                 boolean                                Holds whether or not the user won
+	   input                 char
+
+    Control Flow
+    ============
+    Switch Statement #1:
+	Depending on which difficulty the user chose, set a different number of
+	squares in the grid, the number of pixels per square, and the number of mines
+
+    Counted Loop #1:
+	Counted Lop #2:
+	    Draw all the squares and grid outlines
+
+    Counted Loop #3:
+	Counted Loop #4:
+	    For each square in the grid, reset the information for that square
+
+    Conditional Loop #1:
+	Exits only when the exit variable is set to true.
+	The variable is set to true when the user wins, loses, or gives up.
+
+	Switch Statement #2:
+	    Depending on what key the user presses, handle it by calling the method
+	    corresponding to the action
+
+	    Conditional #1:
+		If the user uncovers a square and the game hasn't started yet,
+		generate the mines and start the timer
+
+	    Conditional #2:
+		If the user lost from uncovering that square (the square is a mine),
+		set the "win" flag to false and exit the loop
+
+	    Conditional #3:
+		If the user won from uncovering the square (all non-mine squares have been uncovered),
+		set the "win" flag to true and exit the loop
+
+    Conditional #4:
+	If the user has won, make all mines green squares
+
+	Counted Loop #5:
+	    Counted Loop #6:
+		For each square in the grid,
+
+		Conditional #5:
+		    If the square contains a mine, make it green on the screen
+
+	If the user didn't win (they lost),
+
+	Counted Loop #7:
+	    Counted Loop #8:
+		For each square in the grid,
+
+		Conditional #6:
+		    If the square is a mine,
+
+		    Conditional #7:
+			If it's been flagged, turn it green (the mine was correctly flagged)
+
+			Otherwise, make it red (the mine was not flagged)
+
+		    Conditional #8:
+			If it's been flagged but isn't a mine, turn it add a red dot to the square
+
+
+    Conditional Loop #2:
+	Exit when the user presses 'c' or 'C'
+    */
     public void game () throws IOException
     {
 	MyTimer mt = new MyTimer (c);
 
 	boolean exit = false;
-	boolean firstClick = true;
 	boolean win = false;
-
 	char input;
 
 	c.clear ();
@@ -494,8 +876,6 @@ public class Minesweeper
 
 	cheating = false;
 
-
-
 	while (!exit)
 	{
 	    input = c.getChar ();
@@ -523,12 +903,12 @@ public class Minesweeper
 		    break;
 		case 'O':
 		case 'o':
-		    if (firstClick)
+		    if (!gameStarted)
 		    {
 			generate ();
 			mt.start ();
 		    }
-		    firstClick = false;
+		    gameStarted = true;
 
 		    if (click ())
 		    {
@@ -578,15 +958,11 @@ public class Minesweeper
 		    if (isMine [y] [x])
 		    {
 			if (flagged [y] [x])
-			{
 			    c.setColor (Color.green);
-			    c.fillRect (x * squareSize + 2, y * squareSize + 2, squareSize - 3, squareSize - 3);
-			}
 			else
-			{
 			    c.setColor (Color.red);
-			    c.fillRect (x * squareSize + 2, y * squareSize + 2, squareSize - 3, squareSize - 3);
-			}
+
+			c.fillRect (x * squareSize + 2, y * squareSize + 2, squareSize - 3, squareSize - 3);
 		    }
 		    else if (flagged [y] [x] && !isMine [y] [x])
 		    {
@@ -623,13 +999,78 @@ public class Minesweeper
 	}
 
 	result ((win ? mt.seconds:
-	- 1));
+	- 1)); //ternary operator
     }
 
 
+    /*
+    Results Screen
+
+    Local Variables
+
+		Name                    Type                                     Description
+    =================================================================================================================
+		 in                BufferedReader                       Object for reading from a file
+		 out                PrinterWriter                        Object for writing to a file
+		header                 String                 Stores the file's first line (should be the header)
+		newName                String             The text that the user chooses as their name for this session
+	       fileName                String                          The name of the file being read
+	       entries                  int                  The number of entries (name/score pairs) in the file
+		scores                 int[]                            All the scores in the file
+		names                 String[]                           All the names in the file
+		input                  char              Character input (to wait for the user to enter newline or space)
+	       charsOK                boolean                Holds whether or not the characters in the name are valid
+
+    Control Flow
+    ============
+
+    Conditional #1:
+	If the time is in a valid range (0 or more), then save the highscore
+
+	Conditional Loop #1:
+	    Keeps looping until the inputted name is valid
+	    (It's valid if the name contains 32 characters or less and contains a non-whitespace character)
+
+	    Counted Loop #1:
+		For each character in the loop
+
+	    Conditional #2:
+		If the name is longer than 32 characters, it is invalid
+
+	    Conditional #3:
+		If the name contains only whitespace characters, it is invalid
+
+	    Conditional #4:
+		If the name is valid, break the loop
+
+	Conditional #5:
+	    If the high scores file doesn't exist, create the file
+
+	    Otherwise, try to read the file
+
+	    Conditional #6:
+		If the header is invalid or missing, erase/reset file
+
+		Otherwise, continue
+
+		Exception Handler #1:
+		    Try to read the file.
+
+		    Counted Loop #2:
+			Read in the names and scores in a loop
+
+		    Counted Loop #3:
+			Re-write the names and scores in a loop back into the file, including the new one
+
+		    If there is an invalid field (NumberFormatException) or a missing field (NullPointerException), reset the file
+
+	If the score is invalid (-1), the user lost.
+
+	Conditional Loop #2:
+	    Exits when the user enters a newline or space
+    */
     private void result (int time) throws IOException
     {
-	title ("Results", 350, 50);
 	BufferedReader in;
 	PrintWriter out;
 	String header, newName = "";
@@ -639,6 +1080,8 @@ public class Minesweeper
 	String names[];
 	char input;
 	boolean charsOK = false;
+
+	title ("Results", 350, 50);
 
 	if (time >= 0)
 	{
@@ -771,6 +1214,24 @@ public class Minesweeper
     }
 
 
+    /*
+    Local Variables
+
+		Name              Type                                                        Description
+    =====================================================================================================================================
+		 m             Minesweeper            Object from this class so that the methods can be excecuted in a non-static context
+
+    Control Flow
+    ============
+
+    Conditional Loop #1:
+	Keeps looping until the user presses 'e' or 'E'
+
+	Conditional #1:
+	    If the menu choice is 1, 2, or 3, start the game
+	Conditional #2:
+	    If the menu choice is Q or q,
+    */
     public static void main (String[] args) throws IOException, InterruptedException
     {
 	Minesweeper m = new Minesweeper ();
