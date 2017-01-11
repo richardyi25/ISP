@@ -1,3 +1,14 @@
+/*
+Dec. 12 2016
+Richard Yi
+Mrs. Krasteva
+ISP (Minesweeper)
+
+A splash screen for the main program.
+There is a single screen which is the splash screen itself.
+
+
+*/
 import hsa.Console;
 import java.awt.*;
 
