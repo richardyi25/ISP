@@ -140,6 +140,7 @@ public class Minesweeper
     The program keeps accepting a character until they type one of the characters
     corresponding to a part of the game (1, 2, 3, Q, W, or E, as well as q, w, or e)
 
+
     Control Flow
     ============
     Conditional Loop #1:
@@ -216,6 +217,11 @@ public class Minesweeper
 		      fileName                             String                               The name of the file being read
 			in                             BufferedReader                            Object for reading the file
 			out                              PrintWriter                           Object for writing to the file
+			 i                                  int                                      Loops from 1 to 3
+			 i                                  int                             Loops from 0 to the numbr of entries
+			 i                                  int                         Loops from 0 to the number of entries minus 1
+			 j                                  int             
+			 i                                  int
 
     Control Flow
     ============
