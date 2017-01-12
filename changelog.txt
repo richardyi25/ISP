@@ -1,5 +1,6 @@
 Changelog:
 -Added comments, complying with the full Grade 11 Programming Style
 -Minor refactoring for readability and compliance with the Programming Style
--Unintentionally changed the text for the instructions because I forgot to backup that version
--
+-Unintentionally changed the text for the instructions screen because I forgot to backup that version
+-High scores screen now allows the user to erase (reset) the high scores file.
+-Centered and repositioned various screen titles
